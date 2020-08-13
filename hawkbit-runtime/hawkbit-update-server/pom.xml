@@ -59,6 +59,15 @@
          <groupId>com.microsoft.sqlserver</groupId>
          <artifactId>mssql-jdbc</artifactId>
       </dependency>
+      <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.eclipse.hawkbit</groupId>
+         <artifactId>hawkbit-extension-artifact-repository-s3</artifactId>
+         <version>${project.version}</version>
+      </dependency>
 
       <!-- Test -->
       <dependency>

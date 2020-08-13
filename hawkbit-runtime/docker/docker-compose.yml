@@ -6,10 +6,9 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 #
-version: '3'
+version: "3"
 
 services:
-
   # ---------------------
   # RabbitMQ service
   # ---------------------
@@ -25,33 +24,54 @@ services:
       NAME: "rabbitmq"
 
   # ---------------------
-  # MySQL service
+  # Postgres service
   # ---------------------
-  mysql:
-    image: "mysql:5.7"
-    environment:
-      MYSQL_DATABASE: "hawkbit"
-      MYSQL_USER: "root"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    restart: always
+  postgres:
+    image: postgres
+    container_name: postgres
     ports:
-      - "3306:3306"
-    labels:
-      NAME: "mysql"
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=hawkbit
+    #volumes:
+    #- postgres-data:/var/lib/postgresql/data/
 
   # ---------------------
   # HawkBit service
   # ---------------------
   hawkbit:
-    image: "hawkbit/hawkbit-update-server:latest-mysql"
+    build:
+      context: ./0.3.0M6-postgres
+    image: "hawkbit/hawkbit-update-server:latest-postgres"
     environment:
-      - 'SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/hawkbit'
-      - 'SPRING_RABBITMQ_HOST=rabbitmq'
-      - 'SPRING_RABBITMQ_USERNAME=guest'
-      - 'SPRING_RABBITMQ_PASSWORD=guest'
-      - 'SPRING_DATASOURCE_USERNAME=root'
+      - "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres"
+      - "SPRING_DATASOURCE_USERNAME=postgres"
+      - "SPRING_DATASOURCE_PASSWORD=admin"
+      - "SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver"
+      - "SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect"
+      - "SPRING_RABBITMQ_HOST=rabbitmq"
+      - "SPRING_RABBITMQ_USERNAME=guest"
+      - "SPRING_RABBITMQ_PASSWORD=guest"
+      - "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE"
+      - "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     restart: always
     ports:
       - "8080:8080"
     labels:
       NAME: "hawkbit"
+
+  minio:
+    image: minio/minio
+    volumes:
+      - data:/data
+    environment:
+      - "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE"
+      - "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    ports:
+      - "9000:9000"
+    command: server /data
+
+volumes:
+  data:
