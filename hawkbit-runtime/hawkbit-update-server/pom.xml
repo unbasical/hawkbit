@@ -65,7 +65,7 @@
       </dependency>
       <dependency>
          <groupId>org.eclipse.hawkbit</groupId>
-         <artifactId>hawkbit-extension-artifact-repository-s3</artifactId>
+         <artifactId>hawkbit-extension-artifact-repository-azure</artifactId>
          <version>${project.version}</version>
       </dependency>
 
