@@ -2,8 +2,9 @@ FROM mdrglobalcr.azurecr.io/hawkbit-update-server:0.3.0M6
 
 ENV MARIADB_DRIVER_VERSION=2.5.3
 
-COPY KEY .
-
+# Download db driver
+COPY --chown=app:root KEY .
+USER root
 RUN set -x \
     && apk add --no-cache --virtual build-dependencies gnupg unzip libressl wget \
     && gpg --import KEY \
@@ -12,4 +13,6 @@ RUN set -x \
     && gpg --verify --batch $JAVA_HOME/lib/ext/mariadb-java-client.jar.asc $JAVA_HOME/lib/ext/mariadb-java-client.jar \
     && apk del build-dependencies
 
+# Run hawkbit
+USER app
 ENTRYPOINT ["java","-jar","/hawkbit-update-server.jar","--spring.profiles.active=mysql","-Xms768m -Xmx768m -XX:MaxMetaspaceSize=250m -XX:MetaspaceSize=250m -Xss300K -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError"]

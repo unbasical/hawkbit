@@ -1,12 +1,12 @@
 # ---------------------
 # MDR Build
 # ---------------------
-FROM maven:3.6.3-openjdk-8 as BUILD
-
-WORKDIR /usr/app
-COPY . /usr/app
-RUN git clone https://github.com/eclipse/hawkbit-extensions.git
-RUN mvn clean install -DskipTests
+#FROM maven:3.6.3-openjdk-8 as BUILD
+#
+#WORKDIR /usr/app
+#COPY . /usr/app
+#RUN git clone https://github.com/eclipse/hawkbit-extensions.git
+#RUN mvn clean install -DskipTests
 
 # ---------------------
 # Runtime Container
@@ -17,9 +17,10 @@ ENV HAWKBIT_VERSION=0.3.0M6 \
     HAWKBIT_HOME=/opt/hawkbit
 
 EXPOSE 8080
+RUN adduser --system --no-create-home --disabled-password --ingroup root app
 
-COPY --from=BUILD /usr/app/hawkbit-update-server/target/hawkbit-update-server-0.3.0-SNAPSHOT.jar hawkbit-update-server.jar
-#COPY ./hawkbit-runtime/hawkbit-update-server/target/hawkbit-update-server-0.3.0-SNAPSHOT.jar hawkbit-update-server.jar
+#COPY --chown=app:root --from=BUILD /usr/app/hawkbit-update-server/target/hawkbit-update-server-0.3.0-SNAPSHOT.jar hawkbit-update-server.jar
+COPY --chown=app:root ./hawkbit-runtime/hawkbit-update-server/target/hawkbit-update-server-0.3.0-SNAPSHOT.jar hawkbit-update-server.jar
 
 RUN set -x \
     && apk add --no-cache --virtual build-dependencies gnupg unzip libressl \
@@ -29,4 +30,5 @@ RUN set -x \
 VOLUME "$HAWKBIT_HOME/data"
 
 WORKDIR $HAWKBIT_HOME
+USER app
 ENTRYPOINT ["java","-jar","hawkbit-update-server.jar","-Xms768m -Xmx768m -XX:MaxMetaspaceSize=250m -XX:MetaspaceSize=250m -Xss300K -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError"]
