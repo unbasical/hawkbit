@@ -160,7 +160,7 @@
       <maven.scm.plugin.version>1.11.1</maven.scm.plugin.version>
 
       <!-- Misc libraries versions - START -->
-      <cron-utils.version>5.0.5</cron-utils.version>
+      <cron-utils.version>9.1.6</cron-utils.version>
       <jsoup.version>1.8.3</jsoup.version>
       <allure.version>2.7.0</allure.version>
       <eclipselink.version>2.7.3</eclipselink.version>
